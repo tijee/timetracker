@@ -1,0 +1,16 @@
+<resources>
+
+    <string name="app_name">Time Tracker</string>
+    <string name="all_projects">All projects</string>
+    <string name="edit_task">Edit</string>
+    <string name="new_task">New task</string>
+    <string name="no_history">No history for this task</string>
+    <string name="no_task">Click on the Add button to create a task</string>
+    <string name="project">Project</string>
+    <string name="project_name_hint">Project name</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="task">Task</string>
+    <string name="task_name_hint">Task description</string>
+
+</resources>

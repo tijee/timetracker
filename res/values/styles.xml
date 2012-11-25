@@ -1,0 +1,54 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="Theme.Styled" parent="@style/Theme.Sherlock.Light">
+        <item name="actionBarItemBackground">@drawable/selectable_background</item>
+        <item name="android:actionBarItemBackground">@drawable/selectable_background</item>
+        <item name="actionBarStyle">@style/Widget.Styled.ActionBar</item>
+        <item name="android:actionBarStyle">@style/Widget.Styled.ActionBar</item>
+        <item name="actionDropDownStyle">@style/Widget.Styled.Spinner.DropDown.ActionBar</item>
+        <item name="android:actionDropDownStyle">@style/Widget.Styled.Spinner.DropDown.ActionBar</item>
+        <item name="dropDownListViewStyle">@style/Widget.Styled.ListView.DropDown</item>
+        <item name="actionMenuTextColor">@android:color/white</item>
+        <item name="android:actionMenuTextColor">@android:color/white</item>
+        <item name="android:dropDownListViewStyle">@style/Widget.Styled.ListView.DropDown</item>
+        <item name="android:listViewStyle">@style/Widget.Styled.ListView</item>
+    </style>
+
+    <style name="Widget.Styled.ActionBar" parent="@style/Widget.Sherlock.Light.ActionBar.Solid.Inverse">
+        <item name="background">@drawable/ab_solid</item>
+        <item name="android:background">@drawable/ab_solid</item>
+    </style>
+
+    <style name="Widget.Styled.ListView" parent="@android:style/Widget.ListView">
+        <item name="android:divider">?android:attr/dividerHorizontal</item>
+        <item name="android:listSelector">@drawable/selectable_background</item>
+    </style>
+
+    <style name="Widget.Styled.ListView.DropDown" parent="@style/Widget.Sherlock.Light.ListView.DropDown">
+        <item name="android:listSelector">@drawable/selectable_background</item>
+    </style>
+
+    <style name="Widget.Styled.Spinner.DropDown.ActionBar" parent="@style/Widget.Sherlock.Light.Spinner.DropDown.ActionBar">
+        <item name="background">@drawable/spinner_background_ab</item>
+        <item name="android:background">@drawable/spinner_background_ab</item>
+    </style>
+
+    <style name="Widget.Styled.TextView.Form" parent="@android:style/Widget.TextView">
+        <item name="android:textColor">@color/secondary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingTop">20dp</item>
+        <item name="android:paddingLeft">12dp</item>
+    </style>
+
+    <style name="Widget.Styled.TextView.ListItem.Primary" parent="@android:style/Widget.TextView">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Widget.Styled.TextView.ListItem.Secondary" parent="@android:style/Widget.TextView">
+        <item name="android:textColor">@android:color/tertiary_text_light</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+</resources>

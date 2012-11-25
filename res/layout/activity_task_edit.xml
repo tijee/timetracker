@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5dp" >
+
+    <TextView
+        style="@style/Widget.Styled.TextView.Form"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/task" />
+
+    <include layout="@layout/form_divider" />
+
+    <EditText
+        android:id="@+id/task_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/task_name_hint"
+        android:inputType="textCapSentences" />
+
+    <TextView
+        style="@style/Widget.Styled.TextView.Form"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/project" />
+
+    <include layout="@layout/form_divider" />
+
+    <com.thomasgallinari.timetracker.widget.InstantAutoCompleteTextView
+        android:id="@+id/project_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:completionThreshold="1"
+        android:hint="@string/project_name_hint"
+        android:inputType="textCapSentences" />
+
+</LinearLayout>
