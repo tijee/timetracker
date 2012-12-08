@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +28,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.thomasgallinari.timetracker.App;
 import com.thomasgallinari.timetracker.R;
 import com.thomasgallinari.timetracker.domain.Task;
+import com.thomasgallinari.timetracker.util.DateUtils;
 
 public class TaskListActivity extends SherlockListActivity implements
 	ActionBar.OnNavigationListener, View.OnClickListener {
@@ -150,7 +150,7 @@ public class TaskListActivity extends SherlockListActivity implements
 			    - task.getStartTimeIfRunning();
 		    totalTimeSpent += timeSpent;
 		    timeSpentView.setText(DateUtils
-			    .formatElapsedTime(timeSpent / 1000));
+			    .formatElapsedTime(timeSpent));
 		}
 		RelativeLayout.LayoutParams totalTimeSpentViewLayoutParams = (RelativeLayout.LayoutParams) totalTimeSpentView
 			.getLayoutParams();
@@ -162,7 +162,7 @@ public class TaskListActivity extends SherlockListActivity implements
 		totalTimeSpentView
 			.setLayoutParams(totalTimeSpentViewLayoutParams);
 		totalTimeSpentView.setText(DateUtils
-			.formatElapsedTime(totalTimeSpent / 1000));
+			.formatElapsedTime(totalTimeSpent));
 		imageView.setTag(task);
 		imageView.setImageDrawable(getResources().getDrawable(
 			task.running ? R.drawable.ic_media_pause

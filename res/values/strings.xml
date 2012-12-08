@@ -12,5 +12,7 @@
     <string name="stop">Stop</string>
     <string name="task">Task</string>
     <string name="task_name_hint">Task description</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
 
 </resources>

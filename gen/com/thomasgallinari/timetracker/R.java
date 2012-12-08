@@ -982,7 +982,7 @@ containing a value of this type.
         public static final int edit_query=0x7f040027;
         public static final int history_duration=0x7f040036;
         public static final int history_header=0x7f040035;
-        public static final int history_interval=0x7f040037;
+        public static final int history_range=0x7f040037;
         public static final int homeAsUp=0x7f040006;
         public static final int listMode=0x7f040002;
         public static final int menu_add=0x7f04003f;
@@ -1104,6 +1104,8 @@ containing a value of this type.
         public static final int stop=0x7f090018;
         public static final int task=0x7f090019;
         public static final int task_name_hint=0x7f09001a;
+        public static final int today=0x7f09001b;
+        public static final int yesterday=0x7f09001c;
     }
     public static final class style {
         public static final int DialogWindowTitle_Sherlock=0x7f0a0036;

@@ -45,9 +45,10 @@ public class TaskHistoryActivity extends SherlockListActivity {
 		start.setTimeInMillis(timeTable.start);
 		end.setTimeInMillis(running ? new Date().getTime()
 			: timeTable.end);
-		if (DateUtils.isSameDay(start, end)) {
+		if (DateUtils.isSameDay(start.getTime(), end.getTime())) {
 		    if (currentHeaderDay == null
-			    || !DateUtils.isSameDay(start, currentHeaderDay)) {
+			    || !DateUtils.isSameDay(start.getTime(),
+				    currentHeaderDay.getTime())) {
 			item = new TaskHistoryItem();
 			item.start = start.getTimeInMillis();
 			item.header = true;
@@ -61,37 +62,37 @@ public class TaskHistoryActivity extends SherlockListActivity {
 		    items.add(item);
 		} else {
 		    Calendar currentDay = end;
-		    Calendar previousDay;
 		    Calendar dayStart;
+		    Date previousDay;
 		    boolean lastDay = true;
 		    do {
-			previousDay = DateUtils.previousDay(currentDay);
+			previousDay = DateUtils.previousDay(currentDay
+				.getTime());
 			dayStart = Calendar.getInstance();
-			dayStart.setTime(previousDay.getTime());
+			dayStart.setTime(previousDay);
 			dayStart.add(Calendar.MILLISECOND, 1);
 			if (currentHeaderDay == null
-				|| !DateUtils.isSameDay(dayStart,
-					currentHeaderDay)) {
+				|| !DateUtils.isSameDay(dayStart.getTime(),
+					currentHeaderDay.getTime())) {
 			    item = new TaskHistoryItem();
 			    item.start = dayStart.getTimeInMillis();
 			    item.header = true;
 			    items.add(item);
-			    currentHeaderDay = start;
+			    currentHeaderDay = dayStart;
 			}
 			item = new TaskHistoryItem();
 			item.start = dayStart.getTimeInMillis();
 			item.end = currentDay.getTimeInMillis();
 			item.running = running && lastDay;
 			items.add(item);
-			currentDay = previousDay;
-			if (lastDay) {
-			    lastDay = false;
-			}
-		    } while (!DateUtils.isSameDay(currentDay, start));
+			currentDay.setTime(previousDay);
+			lastDay = false;
+		    } while (!DateUtils.isSameDay(currentDay.getTime(),
+			    start.getTime()));
 		    if (currentDay.getTimeInMillis() - start.getTimeInMillis() > 0) {
 			if (currentHeaderDay == null
-				|| !DateUtils
-					.isSameDay(start, currentHeaderDay)) {
+				|| !DateUtils.isSameDay(start.getTime(),
+					currentHeaderDay.getTime())) {
 			    item = new TaskHistoryItem();
 			    item.start = start.getTimeInMillis();
 			    item.header = true;
@@ -136,7 +137,7 @@ public class TaskHistoryActivity extends SherlockListActivity {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 	    final TaskHistoryItem historyItem = getItem(position);
-	    View view = convertView;
+	    View view = null;
 	    if (historyItem.header) {
 		view = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
 			.inflate(R.layout.task_history_header, null);
@@ -148,22 +149,29 @@ public class TaskHistoryActivity extends SherlockListActivity {
 		if (historyItem.header) {
 		    TextView headerView = (TextView) view
 			    .findViewById(R.id.history_header);
-		    headerView
-			    .setText(android.text.format.DateUtils
-				    .formatDateTime(
-					    TaskHistoryActivity.this,
-					    historyItem.start,
-					    android.text.format.DateUtils.FORMAT_SHOW_YEAR));
+		    Date today = new Date();
+		    Date itemDate = new Date(historyItem.start);
+		    if (DateUtils.isSameDay(itemDate, today)) {
+			headerView.setText(R.string.today);
+		    } else if (DateUtils.isSameDay(itemDate,
+			    DateUtils.previousDay(today))) {
+			headerView.setText(R.string.yesterday);
+		    } else {
+			headerView
+				.setText(android.text.format.DateUtils
+					.formatDateTime(
+						TaskHistoryActivity.this,
+						historyItem.start,
+						android.text.format.DateUtils.FORMAT_SHOW_YEAR));
+		    }
 		} else {
 		    TextView durationView = (TextView) view
 			    .findViewById(R.id.history_duration);
-		    TextView intervalView = (TextView) view
-			    .findViewById(R.id.history_interval);
-		    durationView
-			    .setText(android.text.format.DateUtils
-				    .formatElapsedTime(historyItem
-					    .getDuration() / 1000));
-		    intervalView
+		    TextView rangeView = (TextView) view
+			    .findViewById(R.id.history_range);
+		    durationView.setText(DateUtils
+			    .formatElapsedTime(historyItem.getDuration()));
+		    rangeView
 			    .setText(android.text.format.DateUtils
 				    .formatDateRange(
 					    TaskHistoryActivity.this,
