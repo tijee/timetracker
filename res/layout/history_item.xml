@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="6dp"
+    android:paddingLeft="12dp"
+    android:paddingRight="12dp"
+    android:paddingTop="6dp" >
+
+    <TextView
+        android:id="@+id/history_task"
+        style="@style/Widget.Styled.TextView.ListItem.Primary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/history_duration"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/history_project"
+        style="@style/Widget.Styled.TextView.ListItem.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/history_task"
+        android:layout_toLeftOf="@+id/history_range"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/history_duration"
+        style="@style/Widget.Styled.TextView.ListItem.Primary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="5dp"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/history_range"
+        style="@style/Widget.Styled.TextView.ListItem.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="5dp"
+        android:singleLine="true" />
+
+</RelativeLayout>

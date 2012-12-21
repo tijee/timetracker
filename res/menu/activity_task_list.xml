@@ -7,8 +7,9 @@
         android:showAsAction="ifRoom|withText"
         android:title="@string/new_task"/>
     <item
-        android:id="@+id/menu_date"
-        android:icon="@drawable/ic_menu_date"
-        android:showAsAction="ifRoom"/>
+        android:id="@+id/menu_history"
+        android:icon="@drawable/ic_menu_history"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/history"/>
 
 </menu>

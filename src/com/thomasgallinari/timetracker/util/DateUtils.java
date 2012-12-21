@@ -1,10 +1,12 @@
 package com.thomasgallinari.timetracker.util;
 
+import android.annotation.SuppressLint;
 import java.util.Calendar;
 import java.util.Date;
 
 public class DateUtils {
 
+    @SuppressLint("DefaultLocale")
     public static String formatElapsedTime(long millis) {
 	long hours = millis / 3600000;
 	long minutes = (millis % 3600000) / 60000;

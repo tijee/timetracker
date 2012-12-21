@@ -241,18 +241,27 @@ public class TaskListActivity extends SherlockListActivity implements
 
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
+	ArrayList<String> projectsParam = new ArrayList<String>(
+		projects.subList(Math.min(projects.size(), 1), projects.size()));
+	Intent intent;
 	switch (item.getItemId()) {
 	case R.id.menu_add:
-	    ArrayList<String> projectsParam = new ArrayList<String>(
-		    projects.subList(Math.min(projects.size(), 1),
-			    projects.size()));
-	    Intent intent = new Intent(this, TaskEditActivity.class)
+	    intent = new Intent(this, TaskEditActivity.class)
 		    .putStringArrayListExtra(TaskEditActivity.EXTRA_PROJECTS,
 			    projectsParam);
 	    if (selectedProject != null) {
 		intent.putExtra(TaskEditActivity.EXTRA_PROJECT, selectedProject);
 	    }
 	    startActivityForResult(intent, REQUEST_NEW_TASK);
+	    return true;
+	case R.id.menu_history:
+	    intent = new Intent(this, HistoryActivity.class)
+		    .putStringArrayListExtra(HistoryActivity.EXTRA_PROJECTS,
+			    projectsParam);
+	    if (selectedProject != null) {
+		intent.putExtra(HistoryActivity.EXTRA_PROJECT, selectedProject);
+	    }
+	    startActivity(intent);
 	    return true;
 	}
 	return super.onMenuItemSelected(featureId, item);

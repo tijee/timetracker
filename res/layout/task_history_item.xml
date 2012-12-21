@@ -4,10 +4,11 @@
     android:layout_height="wrap_content"
     android:paddingBottom="6dp"
     android:paddingLeft="12dp"
+    android:paddingRight="12dp"
     android:paddingTop="6dp" >
 
     <TextView
-        android:id="@+id/history_duration"
+        android:id="@+id/task_history_duration"
         style="@style/Widget.Styled.TextView.ListItem.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,13 +17,13 @@
         android:singleLine="true" />
 
     <TextView
-        android:id="@+id/history_range"
+        android:id="@+id/task_history_range"
         style="@style/Widget.Styled.TextView.ListItem.Secondary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/history_duration"
+        android:layout_below="@+id/task_history_duration"
         android:singleLine="true" />
 
 </RelativeLayout>
