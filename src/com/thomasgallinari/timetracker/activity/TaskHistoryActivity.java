@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
@@ -110,21 +109,10 @@ public class TaskHistoryActivity extends SherlockListActivity {
 	}
 
 	@Override
-	protected void onCancelled() {
-	    setSupportProgressBarIndeterminateVisibility(false);
-	}
-
-	@Override
 	protected void onPostExecute(List<TaskHistoryItem> result) {
 	    history.clear();
 	    history.addAll(result);
 	    historyAdapter.notifyDataSetChanged();
-	    setSupportProgressBarIndeterminateVisibility(false);
-	}
-
-	@Override
-	protected void onPreExecute() {
-	    setSupportProgressBarIndeterminateVisibility(true);
 	}
     }
 
@@ -180,6 +168,9 @@ public class TaskHistoryActivity extends SherlockListActivity {
 						    .getTime()
 						    : historyItem.end,
 					    android.text.format.DateUtils.FORMAT_SHOW_TIME));
+		    view.setBackgroundColor(getResources().getColor(
+			    historyItem.running ? R.color.tertiary
+				    : android.R.color.transparent));
 		}
 	    }
 	    return view;
@@ -277,7 +268,6 @@ public class TaskHistoryActivity extends SherlockListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
-	requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 	setContentView(R.layout.activity_task_history);
 
 	task = (Task) getIntent().getSerializableExtra(EXTRA_TASK);

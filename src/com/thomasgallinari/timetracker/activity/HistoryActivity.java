@@ -13,8 +13,8 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -27,8 +27,95 @@ import com.thomasgallinari.timetracker.db.TimeTableDAO;
 import com.thomasgallinari.timetracker.domain.Task;
 import com.thomasgallinari.timetracker.domain.TimeTable;
 import com.thomasgallinari.timetracker.util.DateUtils;
+import com.thomasgallinari.timetracker.widget.ActionBarSpinnerAdapter;
 
 public class HistoryActivity extends SherlockListActivity {
+
+    class HistoryAdapter extends ArrayAdapter<HistoryItem> {
+
+	public HistoryAdapter(Context context, List<HistoryItem> history) {
+	    super(context, 0, history);
+	}
+
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+	    final HistoryItem historyItem = getItem(position);
+	    View view = null;
+	    if (historyItem.header) {
+		view = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+			.inflate(R.layout.list_header, null);
+	    } else {
+		view = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+			.inflate(R.layout.history_item, null);
+	    }
+	    if (historyItem != null) {
+		if (historyItem.header) {
+		    TextView headerView = (TextView) view
+			    .findViewById(R.id.header);
+		    Date today = new Date();
+		    Date itemDate = new Date(historyItem.start);
+		    if (DateUtils.isSameDay(itemDate, today)) {
+			headerView.setText(R.string.today);
+		    } else if (DateUtils.isSameDay(itemDate,
+			    DateUtils.previousDay(today))) {
+			headerView.setText(R.string.yesterday);
+		    } else {
+			headerView
+				.setText(android.text.format.DateUtils
+					.formatDateTime(
+						HistoryActivity.this,
+						historyItem.start,
+						android.text.format.DateUtils.FORMAT_SHOW_YEAR));
+		    }
+		} else {
+		    TextView taskView = (TextView) view
+			    .findViewById(R.id.history_task);
+		    TextView projectView = (TextView) view
+			    .findViewById(R.id.history_project);
+		    TextView durationView = (TextView) view
+			    .findViewById(R.id.history_duration);
+		    TextView rangeView = (TextView) view
+			    .findViewById(R.id.history_range);
+		    taskView.setText(historyItem.task);
+		    projectView.setText(historyItem.project);
+		    durationView.setText(DateUtils
+			    .formatElapsedTime(historyItem.getDuration()));
+		    rangeView
+			    .setText(android.text.format.DateUtils
+				    .formatDateRange(
+					    HistoryActivity.this,
+					    historyItem.start,
+					    historyItem.running ? new Date()
+						    .getTime()
+						    : historyItem.end,
+					    android.text.format.DateUtils.FORMAT_SHOW_TIME));
+		    view.setBackgroundColor(getResources().getColor(
+			    historyItem.running ? R.color.tertiary
+				    : android.R.color.transparent));
+		}
+	    }
+	    return view;
+	}
+
+	@Override
+	public boolean isEnabled(int position) {
+	    return false;
+	}
+    }
+
+    class HistoryItem {
+
+	public String task;
+	public String project;
+	public long start;
+	public long end;
+	public boolean running;
+	public boolean header;
+
+	public long getDuration() {
+	    return (running ? new Date().getTime() : end) - start;
+	}
+    }
 
     class LoadHistoryTask extends AsyncTask<Object, Void, List<HistoryItem>> {
 
@@ -137,112 +224,25 @@ public class HistoryActivity extends SherlockListActivity {
 	}
 
 	@Override
-	protected void onCancelled() {
-	    setSupportProgressBarIndeterminateVisibility(false);
-	}
-
-	@Override
 	protected void onPostExecute(List<HistoryItem> result) {
 	    history.clear();
 	    history.addAll(result);
 	    historyAdapter.notifyDataSetChanged();
-	    setSupportProgressBarIndeterminateVisibility(false);
-	}
-
-	@Override
-	protected void onPreExecute() {
-	    setSupportProgressBarIndeterminateVisibility(true);
-	}
-    }
-
-    class HistoryAdapter extends ArrayAdapter<HistoryItem> {
-
-	public HistoryAdapter(Context context, List<HistoryItem> history) {
-	    super(context, 0, history);
-	}
-
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-	    final HistoryItem historyItem = getItem(position);
-	    View view = null;
-	    if (historyItem.header) {
-		view = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-			.inflate(R.layout.list_header, null);
-	    } else {
-		view = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-			.inflate(R.layout.history_item, null);
-	    }
-	    if (historyItem != null) {
-		if (historyItem.header) {
-		    TextView headerView = (TextView) view
-			    .findViewById(R.id.header);
-		    Date today = new Date();
-		    Date itemDate = new Date(historyItem.start);
-		    if (DateUtils.isSameDay(itemDate, today)) {
-			headerView.setText(R.string.today);
-		    } else if (DateUtils.isSameDay(itemDate,
-			    DateUtils.previousDay(today))) {
-			headerView.setText(R.string.yesterday);
-		    } else {
-			headerView
-				.setText(android.text.format.DateUtils
-					.formatDateTime(
-						HistoryActivity.this,
-						historyItem.start,
-						android.text.format.DateUtils.FORMAT_SHOW_YEAR));
-		    }
-		} else {
-		    TextView taskView = (TextView) view
-			    .findViewById(R.id.history_task);
-		    TextView projectView = (TextView) view
-			    .findViewById(R.id.history_project);
-		    TextView durationView = (TextView) view
-			    .findViewById(R.id.history_duration);
-		    TextView rangeView = (TextView) view
-			    .findViewById(R.id.history_range);
-		    taskView.setText(historyItem.task);
-		    projectView.setText(historyItem.project);
-		    durationView.setText(DateUtils
-			    .formatElapsedTime(historyItem.getDuration()));
-		    rangeView
-			    .setText(android.text.format.DateUtils
-				    .formatDateRange(
-					    HistoryActivity.this,
-					    historyItem.start,
-					    historyItem.running ? new Date()
-						    .getTime()
-						    : historyItem.end,
-					    android.text.format.DateUtils.FORMAT_SHOW_TIME));
-		}
-	    }
-	    return view;
-	}
-
-	@Override
-	public boolean isEnabled(int position) {
-	    return false;
-	}
-    }
-
-    class HistoryItem {
-
-	public String task;
-	public String project;
-	public long start;
-	public long end;
-	public boolean running;
-	public boolean header;
-
-	public long getDuration() {
-	    return (running ? new Date().getTime() : end) - start;
 	}
     }
 
     public static final String EXTRA_PROJECTS = "projects";
     public static final String EXTRA_PROJECT = "project";
 
-    private String project;
+    private static final int DATE_RANGE_ALL = 0;
+    private static final int DATE_RANGE_DAY = 1;
+    private static final int DATE_RANGE_WEEK = 2;
+    private static final int DATE_RANGE_MONTH = 3;
+
+    private Spinner projectSpinner;
+    private Spinner dateRangeSpinner;
     private ArrayList<String> projects;
+    private String selectedProject;
     private ArrayList<HistoryItem> history;
     private ArrayAdapter<HistoryItem> historyAdapter;
     private Handler timer;
@@ -262,11 +262,10 @@ public class HistoryActivity extends SherlockListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
-	requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 	setContentView(R.layout.activity_history);
 
 	projects = getIntent().getStringArrayListExtra(EXTRA_PROJECTS);
-	project = getIntent().getStringExtra(EXTRA_PROJECT);
+	selectedProject = getIntent().getStringExtra(EXTRA_PROJECT);
 
 	history = new ArrayList<HistoryActivity.HistoryItem>();
 	historyAdapter = new HistoryAdapter(this, history);
@@ -274,10 +273,30 @@ public class HistoryActivity extends SherlockListActivity {
 	ActionBar actionBar = getSupportActionBar();
 	actionBar.setDisplayHomeAsUpEnabled(true);
 	actionBar.setTitle(R.string.history);
+	actionBar.setDisplayShowCustomEnabled(true);
+	actionBar.setCustomView(R.layout.history_action_bar);
+
+	projectSpinner = (Spinner) findViewById(R.id.history_projects);
+	dateRangeSpinner = (Spinner) findViewById(R.id.history_date_range);
+
+	ArrayList<String> dateRanges = new ArrayList<String>();
+	dateRanges.add(getString(R.string.date_range_all));
+	dateRanges.add(getString(R.string.date_range_day));
+	dateRanges.add(getString(R.string.date_range_week));
+	dateRanges.add(getString(R.string.date_range_month));
+
+	projectSpinner.setAdapter(new ActionBarSpinnerAdapter(
+		getSupportActionBar().getThemedContext(),
+		R.layout.sherlock_spinner_dropdown_item, projects));
+	projectSpinner.setSelection(projects.indexOf(selectedProject));
+	dateRangeSpinner.setAdapter(new ActionBarSpinnerAdapter(
+		getSupportActionBar().getThemedContext(),
+		R.layout.sherlock_spinner_dropdown_item, dateRanges));
+	dateRangeSpinner.setSelection(2);
 
 	setListAdapter(historyAdapter);
 
-	new LoadHistoryTask().execute(project);
+	new LoadHistoryTask().execute(selectedProject);
 
 	timer = new Handler();
     }

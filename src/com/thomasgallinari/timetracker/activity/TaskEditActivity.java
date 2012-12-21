@@ -3,7 +3,6 @@ package com.thomasgallinari.timetracker.activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
@@ -32,21 +31,10 @@ public class TaskEditActivity extends SherlockActivity {
 	}
 
 	@Override
-	protected void onCancelled() {
-	    setSupportProgressBarIndeterminateVisibility(false);
-	}
-
-	@Override
 	protected void onPostExecute(Task result) {
-	    setSupportProgressBarIndeterminateVisibility(false);
 	    setResult(RESULT_OK, new Intent().putExtra(
 		    TaskHistoryActivity.EXTRA_TASK, result));
 	    finish();
-	}
-
-	@Override
-	protected void onPreExecute() {
-	    setSupportProgressBarIndeterminateVisibility(true);
 	}
     }
 
@@ -97,7 +85,6 @@ public class TaskEditActivity extends SherlockActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
-	requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 	setContentView(R.layout.activity_task_edit);
 
 	taskInput = (EditText) findViewById(R.id.task_input);

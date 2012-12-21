@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -29,6 +28,7 @@ import com.thomasgallinari.timetracker.App;
 import com.thomasgallinari.timetracker.R;
 import com.thomasgallinari.timetracker.domain.Task;
 import com.thomasgallinari.timetracker.util.DateUtils;
+import com.thomasgallinari.timetracker.widget.ActionBarSpinnerAdapter;
 
 public class TaskListActivity extends SherlockListActivity implements
 	ActionBar.OnNavigationListener, View.OnClickListener {
@@ -40,11 +40,6 @@ public class TaskListActivity extends SherlockListActivity implements
 	    List<String> projects = ((App) getApplication()).getTaskDao()
 		    .getAllProjects();
 	    return projects;
-	}
-
-	@Override
-	protected void onCancelled() {
-	    setSupportProgressBarIndeterminateVisibility(false);
 	}
 
 	@Override
@@ -61,12 +56,6 @@ public class TaskListActivity extends SherlockListActivity implements
 	    }
 	    getSupportActionBar().setSelectedNavigationItem(
 		    selectedProjectIndex);
-	    setSupportProgressBarIndeterminateVisibility(false);
-	}
-
-	@Override
-	protected void onPreExecute() {
-	    setSupportProgressBarIndeterminateVisibility(true);
 	}
     }
 
@@ -81,40 +70,11 @@ public class TaskListActivity extends SherlockListActivity implements
 	}
 
 	@Override
-	protected void onCancelled() {
-	    setSupportProgressBarIndeterminateVisibility(false);
-	}
-
-	@Override
 	protected void onPostExecute(List<Task> result) {
 	    Collections.sort(result, Collections.reverseOrder());
 	    tasks.clear();
 	    tasks.addAll(result);
 	    taskAdapter.notifyDataSetChanged();
-	    setSupportProgressBarIndeterminateVisibility(false);
-	}
-
-	@Override
-	protected void onPreExecute() {
-	    setSupportProgressBarIndeterminateVisibility(true);
-	}
-    }
-
-    class ProjectAdapter extends ArrayAdapter<String> {
-
-	public ProjectAdapter(Context context, int textViewResourceId,
-		List<String> objects) {
-	    super(context, textViewResourceId, objects);
-	}
-
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-	    // hack to set the drop down text color
-	    View view = super.getView(position, convertView, parent);
-	    ((TextView) view.findViewById(android.R.id.text1))
-		    .setTextColor(getResources().getColor(
-			    R.color.abs__primary_text_holo_dark));
-	    return view;
 	}
     }
 
@@ -188,11 +148,6 @@ public class TaskListActivity extends SherlockListActivity implements
 	}
 
 	@Override
-	protected void onCancelled() {
-	    setSupportProgressBarIndeterminateVisibility(false);
-	}
-
-	@Override
 	protected void onPostExecute(Task result) {
 	    for (Task task : tasks) {
 		if (task.id == result.id) {
@@ -201,12 +156,6 @@ public class TaskListActivity extends SherlockListActivity implements
 		}
 	    }
 	    taskAdapter.notifyDataSetChanged();
-	    setSupportProgressBarIndeterminateVisibility(false);
-	}
-
-	@Override
-	protected void onPreExecute() {
-	    setSupportProgressBarIndeterminateVisibility(true);
 	}
     }
 
@@ -241,11 +190,12 @@ public class TaskListActivity extends SherlockListActivity implements
 
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
-	ArrayList<String> projectsParam = new ArrayList<String>(
-		projects.subList(Math.min(projects.size(), 1), projects.size()));
+	ArrayList<String> projectsParam;
 	Intent intent;
 	switch (item.getItemId()) {
 	case R.id.menu_add:
+	    projectsParam = new ArrayList<String>(projects.subList(
+		    Math.min(projects.size(), 1), projects.size()));
 	    intent = new Intent(this, TaskEditActivity.class)
 		    .putStringArrayListExtra(TaskEditActivity.EXTRA_PROJECTS,
 			    projectsParam);
@@ -255,6 +205,7 @@ public class TaskListActivity extends SherlockListActivity implements
 	    startActivityForResult(intent, REQUEST_NEW_TASK);
 	    return true;
 	case R.id.menu_history:
+	    projectsParam = projects;
 	    intent = new Intent(this, HistoryActivity.class)
 		    .putStringArrayListExtra(HistoryActivity.EXTRA_PROJECTS,
 			    projectsParam);
@@ -296,13 +247,12 @@ public class TaskListActivity extends SherlockListActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);
-	requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 	setContentView(R.layout.activity_task_list);
 
 	projects = new ArrayList<String>();
 	tasks = new ArrayList<Task>();
 
-	projectAdapter = new ProjectAdapter(getSupportActionBar()
+	projectAdapter = new ActionBarSpinnerAdapter(getSupportActionBar()
 		.getThemedContext(), R.layout.sherlock_spinner_dropdown_item,
 		projects);
 	taskAdapter = new TaskAdapter(this, tasks);
@@ -321,9 +271,26 @@ public class TaskListActivity extends SherlockListActivity implements
     }
 
     @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+	startActivityForResult(
+		new Intent(this, TaskHistoryActivity.class).putExtra(
+			TaskHistoryActivity.EXTRA_TASK, tasks.get(position))
+			.putStringArrayListExtra(
+				TaskHistoryActivity.EXTRA_PROJECTS, projects),
+		REQUEST_TASK_HISTORY);
+    }
+
+    @Override
     protected void onPause() {
 	super.onPause();
 	runTimer = false;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+	super.onRestoreInstanceState(savedInstanceState);
+	selectedProject = savedInstanceState.getString(STATE_SELECTED_PROJECT);
+	loadTasks();
     }
 
     @Override
@@ -340,23 +307,6 @@ public class TaskListActivity extends SherlockListActivity implements
 		}
 	    }
 	});
-    }
-
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-	startActivityForResult(
-		new Intent(this, TaskHistoryActivity.class).putExtra(
-			TaskHistoryActivity.EXTRA_TASK, tasks.get(position))
-			.putStringArrayListExtra(
-				TaskHistoryActivity.EXTRA_PROJECTS, projects),
-		REQUEST_TASK_HISTORY);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-	super.onRestoreInstanceState(savedInstanceState);
-	selectedProject = savedInstanceState.getString(STATE_SELECTED_PROJECT);
-	loadTasks();
     }
 
     @Override
