@@ -13,6 +13,8 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -130,6 +132,7 @@ public class HistoryActivity extends SherlockListActivity {
 	@Override
 	protected List<HistoryItem> doInBackground(Object... params) {
 	    String project = (String) params[0];
+	    int dateRange = (Integer) params[1];
 	    // TODO Date range
 	    ArrayList<HistoryItem> items = new ArrayList<HistoryItem>();
 	    HistoryItem item;
@@ -242,7 +245,6 @@ public class HistoryActivity extends SherlockListActivity {
     private Spinner projectSpinner;
     private Spinner dateRangeSpinner;
     private ArrayList<String> projects;
-    private String selectedProject;
     private ArrayList<HistoryItem> history;
     private ArrayAdapter<HistoryItem> historyAdapter;
     private Handler timer;
@@ -265,7 +267,7 @@ public class HistoryActivity extends SherlockListActivity {
 	setContentView(R.layout.activity_history);
 
 	projects = getIntent().getStringArrayListExtra(EXTRA_PROJECTS);
-	selectedProject = getIntent().getStringExtra(EXTRA_PROJECT);
+	String selectedProject = getIntent().getStringExtra(EXTRA_PROJECT);
 
 	history = new ArrayList<HistoryActivity.HistoryItem>();
 	historyAdapter = new HistoryAdapter(this, history);
@@ -294,9 +296,25 @@ public class HistoryActivity extends SherlockListActivity {
 		R.layout.sherlock_spinner_dropdown_item, dateRanges));
 	dateRangeSpinner.setSelection(2);
 
+	OnItemSelectedListener onItemSelectedListener = new OnItemSelectedListener() {
+
+	    @Override
+	    public void onItemSelected(AdapterView<?> parent, View view,
+		    int position, long id) {
+		loadHistory();
+	    }
+
+	    @Override
+	    public void onNothingSelected(AdapterView<?> parent) {
+		loadHistory();
+	    }
+	};
+	projectSpinner.setOnItemSelectedListener(onItemSelectedListener);
+	dateRangeSpinner.setOnItemSelectedListener(onItemSelectedListener);
+
 	setListAdapter(historyAdapter);
 
-	new LoadHistoryTask().execute(selectedProject);
+	loadHistory();
 
 	timer = new Handler();
     }
@@ -321,5 +339,14 @@ public class HistoryActivity extends SherlockListActivity {
 		}
 	    }
 	});
+    }
+
+    private void loadHistory() {
+	String selectedProject = null;
+	if (projectSpinner.getSelectedItemPosition() > 0) {
+	    selectedProject = (String) projectSpinner.getSelectedItem();
+	}
+	int selectedDateRange = dateRangeSpinner.getSelectedItemPosition();
+	new LoadHistoryTask().execute(selectedProject, selectedDateRange);
     }
 }
