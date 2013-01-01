@@ -3,7 +3,7 @@
     <string name="app_name">Time Tracker</string>
     <string name="all_projects">All projects</string>
     <string name="date_range_all">All dates</string>
-    <string name="date_range_day">Last 24 hours</string>
+    <string name="date_range_day">Today</string>
     <string name="date_range_week">Last 7 days</string>
     <string name="date_range_month">Last 30 days</string>
     <string name="edit_task">Edit</string>

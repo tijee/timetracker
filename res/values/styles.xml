@@ -7,9 +7,9 @@
         <item name="android:actionBarStyle">@style/Widget.Styled.ActionBar</item>
         <item name="actionDropDownStyle">@style/Widget.Styled.Spinner.DropDown.ActionBar</item>
         <item name="android:actionDropDownStyle">@style/Widget.Styled.Spinner.DropDown.ActionBar</item>
-        <item name="dropDownListViewStyle">@style/Widget.Styled.ListView.DropDown</item>
         <item name="actionMenuTextColor">@android:color/white</item>
         <item name="android:actionMenuTextColor">@android:color/white</item>
+        <item name="dropDownListViewStyle">@style/Widget.Styled.ListView.DropDown</item>
         <item name="android:dropDownListViewStyle">@style/Widget.Styled.ListView.DropDown</item>
         <item name="android:listViewStyle">@style/Widget.Styled.ListView</item>
     </style>
@@ -20,7 +20,7 @@
     </style>
 
     <style name="Widget.Styled.ListView" parent="@android:style/Widget.ListView">
-        <item name="android:divider">?android:attr/dividerHorizontal</item>
+        <item name="android:divider">?android:attr/listDivider</item>
         <item name="android:listSelector">@drawable/selectable_background</item>
     </style>
 

@@ -25,7 +25,6 @@ import com.actionbarsherlock.view.MenuItem;
 import com.thomasgallinari.timetracker.App;
 import com.thomasgallinari.timetracker.R;
 import com.thomasgallinari.timetracker.db.TaskDAO;
-import com.thomasgallinari.timetracker.db.TimeTableDAO;
 import com.thomasgallinari.timetracker.domain.Task;
 import com.thomasgallinari.timetracker.domain.TimeTable;
 import com.thomasgallinari.timetracker.util.DateUtils;
@@ -34,6 +33,9 @@ import com.thomasgallinari.timetracker.widget.ActionBarSpinnerAdapter;
 public class HistoryActivity extends SherlockListActivity {
 
     class HistoryAdapter extends ArrayAdapter<HistoryItem> {
+
+	private static final String TAG_HEADER = "header";
+	private static final String TAG_ITEM = "item";
 
 	public HistoryAdapter(Context context, List<HistoryItem> history) {
 	    super(context, 0, history);
@@ -44,11 +46,23 @@ public class HistoryActivity extends SherlockListActivity {
 	    final HistoryItem historyItem = getItem(position);
 	    View view = null;
 	    if (historyItem.header) {
-		view = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-			.inflate(R.layout.list_header, null);
+		if (convertView != null
+			&& convertView.getTag().equals(TAG_HEADER)) {
+		    view = convertView;
+		} else {
+		    view = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+			    .inflate(R.layout.list_header, null);
+		    view.setTag(TAG_HEADER);
+		}
 	    } else {
-		view = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-			.inflate(R.layout.history_item, null);
+		if (convertView != null
+			&& convertView.getTag().equals(TAG_ITEM)) {
+		    view = convertView;
+		} else {
+		    view = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+			    .inflate(R.layout.history_item, null);
+		    view.setTag(TAG_ITEM);
+		}
 	    }
 	    if (historyItem != null) {
 		if (historyItem.header) {
@@ -122,38 +136,35 @@ public class HistoryActivity extends SherlockListActivity {
     class LoadHistoryTask extends AsyncTask<Object, Void, List<HistoryItem>> {
 
 	private TaskDAO taskDao;
-	private TimeTableDAO timeTableDao;
 
 	public LoadHistoryTask() {
 	    taskDao = ((App) getApplication()).getTaskDao();
-	    timeTableDao = ((App) getApplication()).getTimeTableDao();
 	}
 
 	@Override
 	protected List<HistoryItem> doInBackground(Object... params) {
 	    String project = (String) params[0];
 	    int dateRange = (Integer) params[1];
-	    // TODO Date range
+	    Date startDate = getDateByRange(dateRange);
 	    ArrayList<HistoryItem> items = new ArrayList<HistoryItem>();
 	    HistoryItem item;
 	    Calendar currentHeaderDay = null;
 	    List<TimeTable> timeTables = new ArrayList<TimeTable>();
 	    List<Task> tasks = taskDao.getByProject(project);
 	    for (Task task : tasks) {
-		List<TimeTable> taskTimeTables = timeTableDao.getByTask(task);
-		task.timeTables = taskTimeTables;
-		for (TimeTable timeTable : taskTimeTables) {
-		    timeTable.task = task;
-		}
-		timeTables.addAll(taskTimeTables);
+		timeTables.addAll(task.timeTables);
 	    }
 	    Collections.sort(timeTables, Collections.reverseOrder());
 	    for (TimeTable timeTable : timeTables) {
+		if (timeTable.end > 0 && timeTable.end <= startDate.getTime()) {
+		    continue;
+		}
 		Calendar start = Calendar.getInstance();
 		Calendar end = Calendar.getInstance();
 		boolean running = timeTable.task.running
 			&& timeTable == timeTable.task.timeTables.get(0);
-		start.setTimeInMillis(timeTable.start);
+		start.setTimeInMillis(Math.max(timeTable.start,
+			startDate.getTime()));
 		end.setTimeInMillis(running ? new Date().getTime()
 			: timeTable.end);
 		if (DateUtils.isSameDay(start.getTime(), end.getTime())) {
@@ -294,7 +305,7 @@ public class HistoryActivity extends SherlockListActivity {
 	dateRangeSpinner.setAdapter(new ActionBarSpinnerAdapter(
 		getSupportActionBar().getThemedContext(),
 		R.layout.sherlock_spinner_dropdown_item, dateRanges));
-	dateRangeSpinner.setSelection(2);
+	dateRangeSpinner.setSelection(3);
 
 	OnItemSelectedListener onItemSelectedListener = new OnItemSelectedListener() {
 
@@ -339,6 +350,29 @@ public class HistoryActivity extends SherlockListActivity {
 		}
 	    }
 	});
+    }
+
+    private Date getDateByRange(int range) {
+	Calendar calendar = Calendar.getInstance();
+	calendar.set(Calendar.HOUR_OF_DAY, 0);
+	calendar.set(Calendar.MINUTE, 0);
+	calendar.set(Calendar.SECOND, 0);
+	calendar.set(Calendar.MILLISECOND, 0);
+	switch (range) {
+	case DATE_RANGE_ALL:
+	    calendar.set(Calendar.YEAR, 2000);
+	    break;
+	case DATE_RANGE_DAY:
+	    // nothing to do
+	    break;
+	case DATE_RANGE_WEEK:
+	    calendar.add(Calendar.DAY_OF_MONTH, -7);
+	    break;
+	case DATE_RANGE_MONTH:
+	    calendar.add(Calendar.DAY_OF_MONTH, -30);
+	    break;
+	}
+	return calendar.getTime();
     }
 
     private void loadHistory() {

@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -21,6 +22,7 @@ import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.thomasgallinari.timetracker.App;
 import com.thomasgallinari.timetracker.R;
 import com.thomasgallinari.timetracker.domain.Task;
 import com.thomasgallinari.timetracker.domain.TimeTable;
@@ -118,6 +120,9 @@ public class TaskHistoryActivity extends SherlockListActivity {
 
     class TaskHistoryAdapter extends ArrayAdapter<TaskHistoryItem> {
 
+	private static final String TAG_HEADER = "header";
+	private static final String TAG_ITEM = "item";
+
 	public TaskHistoryAdapter(Context context, List<TaskHistoryItem> history) {
 	    super(context, 0, history);
 	}
@@ -127,11 +132,23 @@ public class TaskHistoryActivity extends SherlockListActivity {
 	    final TaskHistoryItem historyItem = getItem(position);
 	    View view = null;
 	    if (historyItem.header) {
-		view = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-			.inflate(R.layout.list_header, null);
+		if (convertView != null
+			&& convertView.getTag().equals(TAG_HEADER)) {
+		    view = convertView;
+		} else {
+		    view = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+			    .inflate(R.layout.list_header, null);
+		    view.setTag(TAG_HEADER);
+		}
 	    } else {
-		view = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-			.inflate(R.layout.task_history_item, null);
+		if (convertView != null
+			&& convertView.getTag().equals(TAG_ITEM)) {
+		    view = convertView;
+		} else {
+		    view = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+			    .inflate(R.layout.task_history_item, null);
+		    view.setTag(TAG_ITEM);
+		}
 	    }
 	    if (historyItem != null) {
 		if (historyItem.header) {
@@ -194,6 +211,29 @@ public class TaskHistoryActivity extends SherlockListActivity {
 	}
     }
 
+    class ToggleTaskRunningTask extends AsyncTask<Task, Void, Task> {
+
+	@Override
+	protected Task doInBackground(Task... params) {
+	    return ((App) getApplication()).getTaskDao().toggleRunning(
+		    params[0]);
+	}
+
+	@Override
+	@SuppressLint("NewApi")
+	protected void onPostExecute(Task result) {
+	    taskChanged = true;
+	    task = result;
+	    if (task != null && task.running) {
+		startTimer();
+	    } else {
+		stopTimer();
+	    }
+	    new LoadHistoryTask().execute(task);
+	    invalidateOptionsMenu();
+	}
+    }
+
     public static final int REQUEST_EDIT_TASK = 0;
     public static final String EXTRA_TASK = "task";
     public static final String EXTRA_PROJECTS = "projects";
@@ -224,10 +264,16 @@ public class TaskHistoryActivity extends SherlockListActivity {
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
 	switch (item.getItemId()) {
 	case R.id.menu_edit:
+	    ArrayList<String> projectsParam = new ArrayList<String>(
+		    projects.subList(Math.min(projects.size(), 1),
+			    projects.size()));
 	    startActivityForResult(new Intent(this, TaskEditActivity.class)
 		    .putExtra(TaskEditActivity.EXTRA_TASK, task)
-		    .putStringArrayListExtra(EXTRA_PROJECTS, projects),
+		    .putStringArrayListExtra(EXTRA_PROJECTS, projectsParam),
 		    REQUEST_EDIT_TASK);
+	    return true;
+	case R.id.menu_start_stop:
+	    new ToggleTaskRunningTask().execute(task);
 	    return true;
 	default:
 	    return super.onMenuItemSelected(featureId, item);
@@ -243,6 +289,19 @@ public class TaskHistoryActivity extends SherlockListActivity {
 	default:
 	    return super.onOptionsItemSelected(item);
 	}
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+	MenuItem startStopMenuItem = menu.getItem(0);
+	if (task.running) {
+	    startStopMenuItem.setIcon(R.drawable.ic_menu_pause);
+	    startStopMenuItem.setTitle(R.string.stop);
+	} else {
+	    startStopMenuItem.setIcon(R.drawable.ic_menu_play);
+	    startStopMenuItem.setTitle(R.string.start);
+	}
+	return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -291,24 +350,32 @@ public class TaskHistoryActivity extends SherlockListActivity {
     @Override
     protected void onPause() {
 	super.onPause();
-	runTimer = false;
+	stopTimer();
     }
 
     @Override
     protected void onResume() {
 	super.onResume();
 	if (task != null && task.running) {
-	    runTimer = true;
-	    timer.post(new Runnable() {
-
-		@Override
-		public void run() {
-		    historyAdapter.notifyDataSetChanged();
-		    if (runTimer) {
-			timer.postDelayed(this, 1000);
-		    }
-		}
-	    });
+	    startTimer();
 	}
+    }
+
+    private void startTimer() {
+	runTimer = true;
+	timer.post(new Runnable() {
+
+	    @Override
+	    public void run() {
+		historyAdapter.notifyDataSetChanged();
+		if (runTimer) {
+		    timer.postDelayed(this, 1000);
+		}
+	    }
+	});
+    }
+
+    private void stopTimer() {
+	runTimer = false;
     }
 }

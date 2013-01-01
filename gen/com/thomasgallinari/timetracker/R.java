@@ -929,13 +929,15 @@ containing a value of this type.
         public static final int ic_menu_edit=0x7f020074;
         public static final int ic_menu_history=0x7f020075;
         public static final int ic_menu_ok=0x7f020076;
-        public static final int list_focused=0x7f020077;
-        public static final int pressed_background=0x7f020078;
-        public static final int selectable_background=0x7f020079;
-        public static final int spinner_ab_default=0x7f02007a;
-        public static final int spinner_ab_focused=0x7f02007b;
-        public static final int spinner_ab_pressed=0x7f02007c;
-        public static final int spinner_background_ab=0x7f02007d;
+        public static final int ic_menu_pause=0x7f020077;
+        public static final int ic_menu_play=0x7f020078;
+        public static final int list_focused=0x7f020079;
+        public static final int pressed_background=0x7f02007a;
+        public static final int selectable_background=0x7f02007b;
+        public static final int spinner_ab_default=0x7f02007c;
+        public static final int spinner_ab_focused=0x7f02007d;
+        public static final int spinner_ab_pressed=0x7f02007e;
+        public static final int spinner_background_ab=0x7f02007f;
     }
     public static final class id {
         public static final int abs__action_bar=0x7f040022;
@@ -989,10 +991,11 @@ containing a value of this type.
         public static final int history_task=0x7f040037;
         public static final int homeAsUp=0x7f040006;
         public static final int listMode=0x7f040002;
-        public static final int menu_add=0x7f040045;
-        public static final int menu_edit=0x7f040044;
-        public static final int menu_history=0x7f040046;
+        public static final int menu_add=0x7f040046;
+        public static final int menu_edit=0x7f040045;
+        public static final int menu_history=0x7f040047;
         public static final int menu_save=0x7f040043;
+        public static final int menu_start_stop=0x7f040044;
         public static final int normal=0x7f040001;
         public static final int project=0x7f040040;
         public static final int project_input=0x7f040034;

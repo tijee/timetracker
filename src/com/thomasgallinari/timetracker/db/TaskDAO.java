@@ -93,6 +93,9 @@ public class TaskDAO extends DAO<Task> {
 	task.running = cursor.getShort(INDEX_RUNNING) <= 0 ? false : true;
 
 	task.timeTables = app.getTimeTableDao().getByTask(task);
+	for (TimeTable timeTable : task.timeTables) {
+	    timeTable.task = task;
+	}
 
 	return task;
     }
