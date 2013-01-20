@@ -11,5 +11,10 @@
         android:icon="@drawable/ic_menu_edit"
         android:showAsAction="ifRoom|withText"
         android:title="@string/edit_task"/>
+    <item
+        android:id="@+id/menu_delete"
+        android:icon="@drawable/ic_menu_delete"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/delete"/>
 
 </menu>

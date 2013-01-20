@@ -150,7 +150,7 @@ public class HistoryActivity extends SherlockListActivity {
 	    HistoryItem item;
 	    Calendar currentHeaderDay = null;
 	    List<TimeTable> timeTables = new ArrayList<TimeTable>();
-	    List<Task> tasks = taskDao.getByProject(project);
+	    List<Task> tasks = taskDao.getByProject(project, true);
 	    for (Task task : tasks) {
 		timeTables.addAll(task.timeTables);
 	    }

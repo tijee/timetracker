@@ -19,21 +19,33 @@ public class TaskDAO extends DAO<Task> {
     public static final String KEY_PROJECT = "project";
     public static final String KEY_CREATION_DATE = "creation_date";
     public static final String KEY_RUNNING = "running";
+    public static final String KEY_HIDDEN = "hidden";
 
     private static final int INDEX_NAME = 1;
     private static final int INDEX_PROJECT = 2;
     private static final int INDEX_CREATION_DATE = 3;
     private static final int INDEX_RUNNING = 4;
+    private static final int INDEX_HIDDEN = 5;
 
     public TaskDAO(App app) {
 	super(app);
     }
 
-    public List<Task> getByProject(String project) {
+    @Override
+    public void delete(Task task) {
+	super.delete(task);
+	for (TimeTable timeTable : task.timeTables) {
+	    app.getTimeTableDao().delete(timeTable);
+	}
+    }
+
+    public List<Task> getByProject(String project, boolean showHidden) {
 	String where = null;
 	ArrayList<String> params = new ArrayList<String>();
+	where = KEY_HIDDEN + " LIKE ?";
+	params.add(showHidden ? "%" : "0");
 	if (project != null) {
-	    where = "project = ?";
+	    where += " AND " + KEY_PROJECT + " = ?";
 	    params.add(project);
 	}
 	Cursor cursor = app.getDb().query(getTableName(), null, where,
@@ -58,6 +70,15 @@ public class TaskDAO extends DAO<Task> {
 	    cursor.moveToNext();
 	}
 	return projects;
+    }
+
+    public Task hide(Task task) {
+	task.hidden = true;
+	if (task.running) {
+	    return toggleRunning(task);
+	} else {
+	    return update(task);
+	}
     }
 
     public Task toggleRunning(Task task) {
@@ -91,6 +112,7 @@ public class TaskDAO extends DAO<Task> {
 	task.project = cursor.getString(INDEX_PROJECT);
 	task.creationDate = cursor.getLong(INDEX_CREATION_DATE);
 	task.running = cursor.getShort(INDEX_RUNNING) <= 0 ? false : true;
+	task.hidden = cursor.getShort(INDEX_HIDDEN) <= 0 ? false : true;
 
 	task.timeTables = app.getTimeTableDao().getByTask(task);
 	for (TimeTable timeTable : task.timeTables) {
@@ -107,6 +129,7 @@ public class TaskDAO extends DAO<Task> {
 	values.put(KEY_PROJECT, task.project);
 	values.put(KEY_CREATION_DATE, task.creationDate);
 	values.put(KEY_RUNNING, task.running ? 1 : 0);
+	values.put(KEY_HIDDEN, task.hidden ? 1 : 0);
 	return values;
     }
 }

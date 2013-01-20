@@ -8,13 +8,13 @@ import android.provider.BaseColumns;
 public class DbOpenHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "simpletimetracker.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String CREATE_TABLE_TASK = "CREATE TABLE "
 	    + TaskDAO.TABLE_NAME + " (" + BaseColumns._ID
 	    + " INTEGER PRIMARY KEY AUTOINCREMENT, " + TaskDAO.KEY_NAME
 	    + " TEXT, " + TaskDAO.KEY_PROJECT + " TEXT, "
 	    + TaskDAO.KEY_CREATION_DATE + " INTEGER, " + TaskDAO.KEY_RUNNING
-	    + " INTEGER);";
+	    + " INTEGER, " + TaskDAO.KEY_HIDDEN + " INTEGER);";
     private static final String CREATE_TABLE_TIME_TABLE = "CREATE TABLE "
 	    + TimeTableDAO.TABLE_NAME + " (" + BaseColumns._ID
 	    + " INTEGER PRIMARY KEY AUTOINCREMENT, " + TimeTableDAO.KEY_START
@@ -33,6 +33,11 @@ public class DbOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-	// nothing for now
+	if (oldVersion < 2 && newVersion >= 2) {
+	    db.execSQL("ALTER TABLE " + TaskDAO.TABLE_NAME + " ADD COLUMN "
+		    + TaskDAO.KEY_HIDDEN + " INTEGER;");
+	    db.execSQL("UPDATE " + TaskDAO.TABLE_NAME + " SET "
+		    + TaskDAO.KEY_HIDDEN + "=0;");
+	}
     }
 }

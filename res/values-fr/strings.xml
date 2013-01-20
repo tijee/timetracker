@@ -6,6 +6,11 @@
     <string name="date_range_day">Aujourd\'hui</string>
     <string name="date_range_week">7 derniers jours</string>
     <string name="date_range_month">30 derniers jours</string>
+    <string name="delete">Supprimer</string>
+    <string name="delete_button_cancel">Annuler</string>
+    <string name="delete_button_no">Non</string>
+    <string name="delete_button_yes">Oui</string>
+    <string name="delete_message">Vous êtes sur le point de supprimer cette tâche. Voulez-vous l\'effacer de l\'historique également ?</string>
     <string name="edit_task">Modifier</string>
     <string name="history">Historique</string>
     <string name="new_task">Nouvelle tâche</string>

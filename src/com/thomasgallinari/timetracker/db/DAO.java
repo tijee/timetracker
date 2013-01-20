@@ -20,6 +20,11 @@ public abstract class DAO<T extends DomainObject> {
 	this.app = app;
     }
 
+    public void delete(T object) {
+	app.getDb().delete(getTableName(), BaseColumns._ID + " = ?",
+		new String[] { String.valueOf(object.id) });
+    }
+
     public List<T> getAll() {
 	Cursor cursor = app.getDb().query(getTableName(), null, null, null,
 		null, null, null);

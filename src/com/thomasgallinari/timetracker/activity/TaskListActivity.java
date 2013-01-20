@@ -66,7 +66,8 @@ public class TaskListActivity extends SherlockListActivity implements
 	@Override
 	protected List<Task> doInBackground(Bundle... params) {
 	    String project = (String) params[0].get(PARAM_PROJECT);
-	    return ((App) getApplication()).getTaskDao().getByProject(project);
+	    return ((App) getApplication()).getTaskDao().getByProject(project,
+		    false);
 	}
 
 	@Override

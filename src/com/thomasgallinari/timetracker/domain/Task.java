@@ -12,6 +12,7 @@ public class Task extends DomainObject implements Comparable<Task> {
     public String project;
     public long creationDate;
     public boolean running;
+    public boolean hidden;
     public List<TimeTable> timeTables;
 
     public Task() {
